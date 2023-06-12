@@ -1,7 +1,6 @@
 package com.example.matrixcalc
 
 
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.foundation.*
@@ -10,18 +9,44 @@ import androidx.compose.material.*
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OperationWithMatrix(matrix: Array<Array<Int>>) {
+fun OperationButtons(
+    onAddClick: () -> Unit,
+    onSubtractClick: () -> Unit,
+    onMultiplyClick: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+        Button(onClick = onAddClick) {
+            Text("Add")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onSubtractClick) {
+            Text("Subtract")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onMultiplyClick) {
+            Text("Multiply")
+        }
+    }
+}
+
+@Composable
+fun OperationWithMatrix(
+    onDetClick: () -> Unit,
+    onTransClick: () -> Unit,
+    onRankClick: () -> Unit,
+    onReverseClick: () -> Unit,
+) {
     Column(Modifier.width(275.dp)) {
         Row {
             Button(
-                onClick = { findDeterminant(matrix) },
+                onClick = onDetClick,
                 Modifier.fillMaxWidth(0.5f)
             ) {
                 Text("Determinant")
             }
             Spacer(modifier = Modifier.width(5.dp))
             Button(
-                onClick = { reverseMatrix(matrix) },
+                onClick = onReverseClick,
                 Modifier.fillMaxWidth()
             ) {
 
@@ -30,13 +55,13 @@ fun OperationWithMatrix(matrix: Array<Array<Int>>) {
         }
         Row {
             Button(
-                onClick = { transposeMatrix(matrix) },
+                onClick = onTransClick,
                 Modifier.fillMaxWidth(0.5f)
             ) {
                 Text("Transpose")
             }
             Spacer(modifier = Modifier.width(5.dp))
-            Button(onClick = { matrixRank(matrix) }, Modifier.fillMaxWidth()) {
+            Button(onClick = onRankClick, Modifier.fillMaxWidth()) {
                 Text("Rank")
             }
         }
@@ -45,6 +70,7 @@ fun OperationWithMatrix(matrix: Array<Array<Int>>) {
 
 
 }
+
 @Composable
 fun ErrorDialog(errorMessage: String, onClose: () -> Unit) {
     AlertDialog(
@@ -124,14 +150,16 @@ fun MatrixSizeInput(onSizeChange: (Int, Int) -> Unit) {
         }
     }
 }
+
 @Composable
 fun ResultsList(results: List<String>) {
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         results.forEach { result ->
             Text(result)
         }
     }
 }
+
 @Composable
 fun InputMatrix(matrix: Array<Array<Int>>): Array<Array<Int>> {
     for (i in matrix.indices) {

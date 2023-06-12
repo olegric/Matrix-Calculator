@@ -68,7 +68,39 @@ fun MatrixCalculator() {
                         matrix1 = Array(matrix1Rows) { Array(matrix1Cols) { 0 } }
                     }
                     matrix1 = InputMatrix(matrix1)
-                    OperationWithMatrix(matrix = matrix1)
+                    OperationWithMatrix(onDetClick = {
+
+                        try {
+
+                            results.add(0,"Determinant: " + findDeterminant(matrix1).toString())
+                        } catch (e: IllegalArgumentException) {
+                            errorDialogState = true
+                            errorMessage = e.message ?: ""
+                        }},
+                        onTransClick = {
+
+
+                            resultMatrix = transposeMatrix(matrix1)
+                            results.add(0,"Transpose :\n" +
+                                    "${joinToString(resultMatrix!!)}" )
+
+                        },
+                        onRankClick = {
+
+
+                                results.add(0,"Rank: " +" ${matrixRank(matrix1)}")
+
+                        },
+                        onReverseClick = {
+                            try {
+
+                                results.add(0,"Determinant: " + reverseMatrix(matrix2).toString())
+                            } catch (e: IllegalArgumentException) {
+                                errorDialogState = true
+                                errorMessage = e.message ?: ""
+                            }
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,46 +111,73 @@ fun MatrixCalculator() {
                         matrix2 = Array(matrix2Rows) { Array(matrix2Cols) { 0 } }
                     }
                     matrix2 = InputMatrix(matrix2)
-                    OperationWithMatrix(matrix = matrix2)
+                    OperationWithMatrix(onDetClick = {
+                        try {
+
+                            results.add(0,"Determinant: " + findDeterminant(matrix2).toString())
+                        } catch (e: IllegalArgumentException) {
+                            errorDialogState = true
+                            errorMessage = e.message ?: ""
+                        }
+                    },
+                        onTransClick = {
+                            resultMatrix = transposeMatrix(matrix2)
+                            results.add(0,"Transpose :\n" +
+                                    "${joinToString(resultMatrix!!)}" )
+
+                    },
+                        onRankClick = {
+                            results.add(0,"Rank: " +" ${matrixRank(matrix2)}")
+                    },
+                        onReverseClick = {
+                        try {
+
+                            results.add(0,"Inverse Matrix:\n${joinToString(reverseMatrix(matrix2))}")
+                        } catch (e: IllegalArgumentException) {
+                            errorDialogState = true
+                            errorMessage = e.message ?: ""
+                        }
+                    }
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Add buttons for performing operations
-                    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Button(onClick = {
+                    OperationButtons(
+                        onAddClick = {
                             try {
                                 resultMatrix = addMatrices(matrix1, matrix2)
 
-                                results.add(0, "Addition Result: ${resultMatrix!!.joinToString()}")
+                                results.add(0, "Addition Result:\n${joinToString(resultMatrix!!)}")
                             } catch (e: IllegalArgumentException) {
                                 errorDialogState = true
                                 errorMessage = e.message ?: ""
                             }
-                        }) {
-                            Text("Add")
-                        }
-
-                        Button(onClick = {
+                        },
+                        onSubtractClick = {
                             try {
                                 resultMatrix = subtractMatrices(matrix1, matrix2)
+                                results.add(
+                                    0, "Subtraction Result\n" +
+                                            "${joinToString(resultMatrix!!)}"
+                                )
                             } catch (e: IllegalArgumentException) {
                                 errorDialogState = true
                                 errorMessage = e.message ?: ""
                             }
-                        }) {
-                            Text("Subtract")
-                        }
-
-                        Button(onClick = {
+                        },
+                        onMultiplyClick = {
                             try {
                                 resultMatrix = multiplyMatrices(matrix1, matrix2)
+                                results.add(
+                                    0, "Multiplication Result\n" +
+                                            "${joinToString(resultMatrix!!)}"
+                                )
                             } catch (e: IllegalArgumentException) {
                                 errorDialogState = true
                                 errorMessage = e.message ?: ""
                             }
-                        }) {
-                            Text("Multiply")
                         }
-                    }
+                    )
 
 
                     // Display result matrix
@@ -144,3 +203,5 @@ fun MatrixCalculator() {
         }
     }
 }
+
+
