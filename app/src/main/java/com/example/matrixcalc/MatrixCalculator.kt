@@ -6,30 +6,30 @@ import androidx.compose.ui.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
+
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MatrixCalculator() {
+
+fun MatrixCalculator(onColorSchemeChange: () -> Unit) {
     var matrix1Rows by remember { mutableStateOf(3) }
     var matrix1Cols by remember { mutableStateOf(3) }
     var matrix1 by remember(
         matrix1Rows,
         matrix1Cols
-    ) { mutableStateOf(Array(matrix1Rows) { Array(matrix1Cols) { 0 } }) }
+    ) { mutableStateOf(Array(matrix1Rows) { Array(matrix1Cols) { 0f } }) }
 
     var matrix2Rows by remember { mutableStateOf(3) }
     var matrix2Cols by remember { mutableStateOf(3) }
     var matrix2 by remember(
         matrix2Rows,
         matrix2Cols
-    ) { mutableStateOf(Array(matrix2Rows) { Array(matrix2Cols) { 0 } }) }
+    ) { mutableStateOf(Array(matrix2Rows) { Array(matrix2Cols) { 0f } }) }
 
-    var resultMatrix by remember { mutableStateOf<Array<Array<Int>>?>(null) }
+    var resultMatrix by remember { mutableStateOf<Array<Array<Float>>?>(null) }
 
     var errorDialogState by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -42,9 +42,13 @@ fun MatrixCalculator() {
                 title = { Text("Matrix Calculator") },
                 actions = {
                     IconButton(onClick = {
-
+                        onColorSchemeChange()
                     }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Clear")
+
+                        Icon(
+                            painter = painterResource(R.drawable.dark_mode),
+                            contentDescription = "Clear"
+                        )
                     }
                 }
             )
@@ -65,36 +69,45 @@ fun MatrixCalculator() {
                     MatrixSizeInput { rows, cols ->
                         matrix1Rows = rows
                         matrix1Cols = cols
-                        matrix1 = Array(matrix1Rows) { Array(matrix1Cols) { 0 } }
+                        matrix1 = Array(matrix1Rows) { Array(matrix1Cols) { 0f } }
                     }
                     matrix1 = InputMatrix(matrix1)
                     OperationWithMatrix(onDetClick = {
 
                         try {
 
-                            results.add(0,"Determinant: " + findDeterminant(matrix1).toString())
+                            results.add(
+                                0,
+                                "Determinant: " + findDeterminant(matrix1).toString()
+                            )
                         } catch (e: IllegalArgumentException) {
                             errorDialogState = true
                             errorMessage = e.message ?: ""
-                        }},
+                        }
+                    },
                         onTransClick = {
 
 
                             resultMatrix = transposeMatrix(matrix1)
-                            results.add(0,"Transpose :\n" +
-                                    "${joinToString(resultMatrix!!)}" )
+                            results.add(
+                                0, "Transpose :\n" +
+                                        "${joinToString(resultMatrix!!)}"
+                            )
 
                         },
                         onRankClick = {
 
 
-                                results.add(0,"Rank: " +" ${matrixRank(matrix1)}")
+                            results.add(0, "Rank: " + " ${matrixRank(matrix1)}")
 
                         },
                         onReverseClick = {
                             try {
 
-                                results.add(0,"Determinant: " + reverseMatrix(matrix2).toString())
+                                results.add(
+                                    0,
+                                    "Inverse Matrix:\n${joinToString(reverseMatrix(matrix1))}"
+                                )
                             } catch (e: IllegalArgumentException) {
                                 errorDialogState = true
                                 errorMessage = e.message ?: ""
@@ -108,13 +121,16 @@ fun MatrixCalculator() {
                     MatrixSizeInput { rows, cols ->
                         matrix2Rows = rows
                         matrix2Cols = cols
-                        matrix2 = Array(matrix2Rows) { Array(matrix2Cols) { 0 } }
+                        matrix2 = Array(matrix2Rows) { Array(matrix2Cols) { 0f } }
                     }
                     matrix2 = InputMatrix(matrix2)
                     OperationWithMatrix(onDetClick = {
                         try {
 
-                            results.add(0,"Determinant: " + findDeterminant(matrix2).toString())
+                            results.add(
+                                0,
+                                "Determinant: " + findDeterminant(matrix2).toString()
+                            )
                         } catch (e: IllegalArgumentException) {
                             errorDialogState = true
                             errorMessage = e.message ?: ""
@@ -122,22 +138,27 @@ fun MatrixCalculator() {
                     },
                         onTransClick = {
                             resultMatrix = transposeMatrix(matrix2)
-                            results.add(0,"Transpose :\n" +
-                                    "${joinToString(resultMatrix!!)}" )
+                            results.add(
+                                0, "Transpose :\n" +
+                                        "${joinToString(resultMatrix!!)}"
+                            )
 
-                    },
+                        },
                         onRankClick = {
-                            results.add(0,"Rank: " +" ${matrixRank(matrix2)}")
-                    },
+                            results.add(0, "Rank: " + " ${matrixRank(matrix2)}")
+                        },
                         onReverseClick = {
-                        try {
+                            try {
 
-                            results.add(0,"Inverse Matrix:\n${joinToString(reverseMatrix(matrix2))}")
-                        } catch (e: IllegalArgumentException) {
-                            errorDialogState = true
-                            errorMessage = e.message ?: ""
+                                results.add(
+                                    0,
+                                    "Inverse Matrix:\n${joinToString(reverseMatrix(matrix2))}"
+                                )
+                            } catch (e: IllegalArgumentException) {
+                                errorDialogState = true
+                                errorMessage = e.message ?: ""
+                            }
                         }
-                    }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -181,11 +202,7 @@ fun MatrixCalculator() {
 
 
                     // Display result matrix
-                    resultMatrix?.let {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Result")
-                        DisplayMatrix(it)
-                    }
+
                     if (results.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Results")

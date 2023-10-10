@@ -3,14 +3,14 @@ package com.example.matrixcalc
 import kotlin.math.roundToInt
 
 
-fun addMatrices(matrix1: Array<Array<Int>>, matrix2: Array<Array<Int>>): Array<Array<Int>> {
+fun addMatrices(matrix1: Array<Array<Float>>, matrix2: Array<Array<Float>>): Array<Array<Float>> {
     if (matrix1.size != matrix2.size || matrix1[0].size != matrix2[0].size) {
         throw IllegalArgumentException("Matrix dimensions do not match for addition")
     }
 
-    val result = Array(matrix1.size) { Array(matrix1[0].size) { 0 } }
-    for (i in matrix1.indices) {
-        for (j in matrix1[i].indices) {
+    val result = Array(matrix1.size) { Array(matrix1[0].size) { 0f } }
+    for (i in 0 until matrix1.size) {
+        for (j in 0 until matrix1[0].size) {
             result[i][j] = matrix1[i][j] + matrix2[i][j]
         }
     }
@@ -18,16 +18,16 @@ fun addMatrices(matrix1: Array<Array<Int>>, matrix2: Array<Array<Int>>): Array<A
 }
 
 fun subtractMatrices(
-    matrix1: Array<Array<Int>>,
-    matrix2: Array<Array<Int>>
-): Array<Array<Int>> {
+    matrix1: Array<Array<Float>>,
+    matrix2: Array<Array<Float>>
+): Array<Array<Float>> {
     if (matrix1.size != matrix2.size || matrix1[0].size != matrix2[0].size) {
         throw IllegalArgumentException("Matrix dimensions do not match for subtraction")
     }
 
-    val result = Array(matrix1.size) { Array(matrix1[0].size) { 0 } }
+    val result = Array(matrix1.size) { Array(matrix1[0].size) { 0f } }
     for (i in matrix1.indices) {
-        for (j in matrix1[i].indices) {
+        for (j in 0 until matrix1[0].size) {
             result[i][j] = matrix1[i][j] - matrix2[i][j]
         }
     }
@@ -35,14 +35,14 @@ fun subtractMatrices(
 }
 
 fun multiplyMatrices(
-    matrix1: Array<Array<Int>>,
-    matrix2: Array<Array<Int>>
-): Array<Array<Int>> {
+    matrix1: Array<Array<Float>>,
+    matrix2: Array<Array<Float>>
+): Array<Array<Float>> {
     if (matrix1[0].size != matrix2.size) {
         throw IllegalArgumentException("Matrix dimensions do not match for multiplication")
     }
 
-    val result = Array(matrix1.size) { Array(matrix2[0].size) { 0 } }
+    val result = Array(matrix1.size) { Array(matrix2[0].size) { 0f } }
     for (i in matrix1.indices) {
         for (j in matrix2[0].indices) {
             for (k in matrix2.indices) {
@@ -53,10 +53,11 @@ fun multiplyMatrices(
     return result
 }
 
-fun findDeterminant(matrix: Array<Array<Int>>): Float {
+fun findDeterminant(matrix: Array<Array<Float>>): Float {
     val size = matrix.size
-    if( matrix.size != matrix[0].size){
-        throw IllegalArgumentException("Matrix cannot be empty and must be square")}
+    if (matrix.size != matrix[0].size) {
+        throw IllegalArgumentException("Matrix cannot be empty and must be square")
+    }
 
 
     if (size == 1) {
@@ -66,7 +67,7 @@ fun findDeterminant(matrix: Array<Array<Int>>): Float {
     var determinant = 0f
 
     for (column in 0 until size) {
-        val subMatrix = Array(size - 1) { Array(size - 1) { 0 } }
+        val subMatrix = Array(size - 1) { Array(size - 1) { 0f } }
 
         for (i in 1 until size) {
             var subMatrixColumn = 0
@@ -85,7 +86,7 @@ fun findDeterminant(matrix: Array<Array<Int>>): Float {
     return determinant
 }
 
-fun reverseMatrix(matrix: Array<Array<Int>>): Array<Array<Float>> {
+fun reverseMatrix(matrix: Array<Array<Float>>): Array<Array<Float>> {
     val size = matrix.size
 
     if (size != matrix[0].size) {
@@ -94,7 +95,7 @@ fun reverseMatrix(matrix: Array<Array<Int>>): Array<Array<Float>> {
 
     val determinant = findDeterminant(matrix)
     if (determinant == 0f) {
-        throw IllegalArgumentException("Matrix must be invertible")
+        throw IllegalArgumentException("Determinant must be greater 0")
     }
 
     val adjugateMatrix = Array(size) { Array(size) { 0f } }
@@ -118,16 +119,16 @@ fun reverseMatrix(matrix: Array<Array<Int>>): Array<Array<Float>> {
 }
 
 fun createMinor(
-    matrix: Array<Array<Int>>,
+    matrix: Array<Array<Float>>,
     rowToRemove: Int,
     colToRemove: Int
-): Array<Array<Int>> {
+): Array<Array<Float>> {
     val size = matrix.size
     require(size > 1) { "Matrix must have a size greater than 1" }
     require(rowToRemove in 0 until size) { "Invalid row index" }
     require(colToRemove in 0 until size) { "Invalid column index" }
 
-    val minor = Array(size - 1) { Array(size - 1) { 0 } }
+    val minor = Array(size - 1) { Array(size - 1) { 0f } }
     var minorRow = 0
 
     for (row in 0 until size) {
@@ -148,12 +149,11 @@ fun createMinor(
 }
 
 
-
-fun matrixRank(matrix: Array<Array<Int>>): Int {
+fun matrixRank(matrix: Array<Array<Float>>): Float {
     val rows = matrix.size
     val cols = matrix[0].size
 
-    var rank = 0
+    var rank = 0f
     val rowEchelonForm = matrix.copyOf()
     var lead = 0
 
@@ -163,7 +163,7 @@ fun matrixRank(matrix: Array<Array<Int>>): Int {
         }
 
         var i = row
-        while (rowEchelonForm[i][lead] == 0) {
+        while (rowEchelonForm[i][lead] == 0f) {
             i++
             if (i == rows) {
                 i = row
@@ -202,11 +202,11 @@ fun matrixRank(matrix: Array<Array<Int>>): Int {
 }
 
 
-fun transposeMatrix(matrix: Array<Array<Int>>): Array<Array<Int>> {
+fun transposeMatrix(matrix: Array<Array<Float>>): Array<Array<Float>> {
     val rows = matrix.size
     val cols = matrix[0].size
 
-    val transposedMatrix = Array(cols) { Array(rows) { 0 } }
+    val transposedMatrix = Array(cols) { Array(rows) { 0f } }
     for (row in 0 until rows) {
         for (col in 0 until cols) {
             transposedMatrix[col][row] = matrix[row][col]
@@ -215,29 +215,15 @@ fun transposeMatrix(matrix: Array<Array<Int>>): Array<Array<Int>> {
 
     return transposedMatrix
 }
-fun joinToString(matrix: Array<Array<Int>>): String {
-    var str = ""
-    val rows = matrix.size
-    val cols = matrix[0].size
-    for (row in 0 until rows) {
-        for (col in 0 until cols) {
 
-            var num = ""+(matrix[row][col])
-
-            str = str.plus("--".repeat(6-num.length-2)  + num) // Assign the concatenated string back to str
-        }
-        str = str.plus("\n") // Assign the concatenated string back to str
-    }
-    return str
-}
 fun joinToString(matrix: Array<Array<Float>>): String {
     var str = ""
     val rows = matrix.size
     val cols = matrix[0].size
     for (row in 0 until rows) {
         for (col in 0 until cols) {
-            val num = ""+((matrix[row][col] * 100.0).roundToInt() / 100.0)
-                 str = str.plus(" ".repeat(6-num.length)  + num)
+            val num = "" + ((matrix[row][col] * 100.0).roundToInt() / 100.0)
+            str = str.plus(" ".repeat(6 - num.length) + num)
         }
         str = str.plus("\n") // Assign the concatenated string back to str
     }

@@ -5,8 +5,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 @Composable
 fun OperationButtons(
@@ -85,22 +90,6 @@ fun ErrorDialog(errorMessage: String, onClose: () -> Unit) {
     )
 }
 
-@Composable
-fun DisplayMatrix(matrix: Array<Array<Int>>) {
-    Column {
-        for (i in matrix.indices) {
-            Row(modifier = Modifier.padding(8.dp)) {
-                for (j in matrix[i].indices) {
-                    Text(
-                        text = matrix[i][j].toString(),
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
 
 @Composable
 fun MatrixSizeInput(onSizeChange: (Int, Int) -> Unit) {
@@ -112,15 +101,15 @@ fun MatrixSizeInput(onSizeChange: (Int, Int) -> Unit) {
             Text("Rows: $rows")
             Row {
                 Button(onClick = {
-                    rows--
-                    onSizeChange(if (rows > 0) rows else 3, if (cols > 0) cols else 3)
+                    if (rows > 1) rows--
+                    onSizeChange(rows, cols)
                 }) {
                     Text(text = "-")
 
                 }
                 Button(onClick = {
-                    rows++
-                    onSizeChange(if (rows > 0) rows else 3, if (cols > 0) cols else 3)
+                    if (rows < 6) rows++
+                    onSizeChange(rows, cols)
                 }) {
                     Text(text = "+")
                 }
@@ -133,15 +122,17 @@ fun MatrixSizeInput(onSizeChange: (Int, Int) -> Unit) {
             Text("Cols: $cols")
             Row {
                 Button(onClick = {
-                    cols--
-                    onSizeChange(if (rows > 0) rows else 3, if (cols > 0) cols else 3)
+                    if (cols > 1) cols--
+                    onSizeChange(rows, cols)
+
+
                 }) {
                     Text(text = "-")
 
                 }
                 Button(onClick = {
-                    cols++
-                    onSizeChange(if (rows > 0) rows else 3, if (cols > 0) cols else 3)
+                    if (cols < 6) cols++
+                    onSizeChange(rows, cols)
                 }) {
                     Text(text = "+")
                 }
@@ -161,23 +152,51 @@ fun ResultsList(results: List<String>) {
 }
 
 @Composable
-fun InputMatrix(matrix: Array<Array<Int>>): Array<Array<Int>> {
-    for (i in matrix.indices) {
-        Row {
-            for (j in matrix[i].indices) {
-                var element by remember { mutableStateOf(matrix[i][j].toString()) }
-                TextField(
-                    value = element,
-                    onValueChange = { newValue ->
-                        element = newValue
-                        matrix[i][j] = newValue.toIntOrNull() ?: 0
-                    },
-                    modifier = Modifier
-                        .width(60.dp)
-                        .padding(5.dp)  // Specify the width of TextField to avoid overflow
-                )
+fun InputMatrix(matrix: Array<Array<Float>>): Array<Array<Float>> {
+    Column(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+
+
+        for (i in matrix.indices) {
+            Row {
+                for (j in matrix[i].indices) {
+                    var element by remember { mutableStateOf(matrix[i][j].toString()) }
+                    var previousText by remember { mutableStateOf("") }
+                    TextField(
+                        value = element,
+                        onValueChange = { newValue ->
+                            element = newValue
+                            matrix[i][j] = newValue.toFloatOrNull() ?: 0f
+                        },
+                        modifier = Modifier
+                            .width(80.dp)
+                            .padding(5.dp)
+                            .onFocusChanged { focusState ->
+                                if (!focusState.isFocused && element.isEmpty()) {
+                                    element = previousText
+                                } else if (focusState.isFocused) {
+                                    previousText = element
+                                    element = ""
+                                }
+                            }  // Specify the width of TextField to avoid overflow
+                    )
+                }
             }
         }
     }
     return matrix
+}
+
+@Composable
+fun RandomMatrixButton(onRandomMatrix: (Array<Array<Float>>) -> Unit) {
+    Button(onClick = { onRandomMatrix(generateRandomMatrix(3, 3, 0..10)) }) {
+        Text("Random Matrix")
+    }
+}
+
+fun generateRandomMatrix(rows: Int, cols: Int, rage: IntRange): Array<Array<Float>> {
+    return Array(rows) {
+        Array(cols) {
+            Random.nextInt(rage).toFloat()
+        }
+    }
 }
